@@ -1,0 +1,7 @@
+apiVersion: k8s.yunzhijia.com/v1
+kind: OpDemo
+metadata:
+  name: example-opdemo
+spec:
+  # Add fields here
+  size: 3
