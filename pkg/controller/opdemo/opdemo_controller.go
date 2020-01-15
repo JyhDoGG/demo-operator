@@ -134,9 +134,19 @@ func newPodForCR(cr *k8sv1.OpDemo) *corev1.Pod {
 	labels := map[string]string{
 		"app": cr.Name,
 	}
+
+	contextPathStr := ""
+	for i := 0; i < len(cr.Spec.ContextPath); i++ {
+		contextPathStr := contextPathStr + cr.Spec.ContextPath[i]
+		if i != len(cr.Spec.ContextPath) - 1 {
+			contextPathStr := contextPathStr + ","
+		}
+	}
+
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
+			//Name:      cr.Name + "-pod",
+			Name:      "opdemo-" + cr.Name,
 			Namespace: cr.Namespace,
 			Labels:    labels,
 		},
@@ -145,7 +155,7 @@ func newPodForCR(cr *k8sv1.OpDemo) *corev1.Pod {
 				{
 					Name:    "busybox",
 					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
+					Command: []string{"echo", contextPathStr},
 				},
 			},
 		},

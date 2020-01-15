@@ -1,7 +1,12 @@
 apiVersion: k8s.yunzhijia.com/v1
 kind: OpDemo
 metadata:
-  name: example-opdemo
+  name: openorg
+  namespace: yzj
 spec:
   # Add fields here
-  size: 3
+  #size: 3
+  contextPath: 
+    - openorg/*
+    - openorg/user/*
+    
