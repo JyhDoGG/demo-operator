@@ -136,10 +136,10 @@ func newPodForCR(cr *k8sv1.OpDemo) *corev1.Pod {
 	}
 
 	contextPathStr := ""
-	for i := 0; i < len(cr.Spec.ContextPath); i++ {
-		contextPathStr := contextPathStr + cr.Spec.ContextPath[i]
-		if i != len(cr.Spec.ContextPath) - 1 {
-			contextPathStr := contextPathStr + ","
+	for i, v := range cr.Spec.ContextPath {
+		contextPathStr = contextPathStr + v
+		if i != len(cr.Spec.ContextPath)-1 {
+			contextPathStr = contextPathStr + ","
 		}
 	}
 
