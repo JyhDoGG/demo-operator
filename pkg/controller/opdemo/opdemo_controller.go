@@ -2,6 +2,7 @@ package opdemo
 
 import (
 	"context"
+	"fmt"
 
 	k8sv1 "github.com/JyhDoGG/demo-operator/pkg/apis/k8s/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -149,7 +150,7 @@ func newPodForCR(cr *k8sv1.OpDemo, serviceClusterIP string) *corev1.Pod {
 			contextPathStr = contextPathStr + ","
 		}
 	}
-	registArg := "serviceName: " + cr.Name + "contextPathStr: " + contextPathStr + "serviceClusterIP: " + serviceClusterIP
+	registArg := fmt.Sprintf("serviceName: %s contextPathStr: %s serviceClusterIP: %s ", cr.Name, contextPathStr, serviceClusterIP)
 
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -164,7 +165,7 @@ func newPodForCR(cr *k8sv1.OpDemo, serviceClusterIP string) *corev1.Pod {
 					Name:    "busybox",
 					Image:   "busybox",
 					Command: []string{"/bin/sh"},
-					Args:    []string{"-c", "echo " + registArg},
+					Args:    []string{"-c", fmt.Sprintf("echo '%s' ;sleep 3600", registArg)},
 				},
 			},
 		},
