@@ -100,8 +100,15 @@ func (r *ReconcileOpDemo) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
+	//get servicePort
+	service := &corev1.Service{}
+	if err := r.client.Get(context.TODO(), types.NamespacedName{Name: instance.Name, Namespace: instance.Namespace}, service); err != nil {
+		return reconcile.Result{}, err
+	}
+	serviceClusterIP := service.Spec.ClusterIP
+
 	// Define a new Pod object
-	pod := newPodForCR(instance)
+	pod := newPodForCR(instance, serviceClusterIP)
 
 	// Set OpDemo instance as the owner and controller
 	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
@@ -130,7 +137,7 @@ func (r *ReconcileOpDemo) Reconcile(request reconcile.Request) (reconcile.Result
 }
 
 // newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *k8sv1.OpDemo) *corev1.Pod {
+func newPodForCR(cr *k8sv1.OpDemo, serviceClusterIP string) *corev1.Pod {
 	labels := map[string]string{
 		"app": cr.Name,
 	}
@@ -142,6 +149,7 @@ func newPodForCR(cr *k8sv1.OpDemo) *corev1.Pod {
 			contextPathStr = contextPathStr + ","
 		}
 	}
+	registArg := "serviceName: " + cr.Name + "contextPathStr: " + contextPathStr + "serviceClusterIP: " + serviceClusterIP
 
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -155,7 +163,8 @@ func newPodForCR(cr *k8sv1.OpDemo) *corev1.Pod {
 				{
 					Name:    "busybox",
 					Image:   "busybox",
-					Command: []string{"echo", contextPathStr},
+					Command: []string{"/bin/sh"},
+					Args:    []string{"-c", "echo " + registArg},
 				},
 			},
 		},
