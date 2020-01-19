@@ -150,7 +150,11 @@ func newPodForCR(cr *k8sv1.OpDemo, serviceClusterIP string) *corev1.Pod {
 			contextPathStr = contextPathStr + ","
 		}
 	}
-	registArg := fmt.Sprintf("serviceName: %s contextPathStr: %s serviceClusterIP: %s ", cr.Name, contextPathStr, serviceClusterIP)
+	skipPrefik := "0"
+	if cr.Name == "orgunit-rest" {
+		skipPrefik = "1"
+	}
+	registArg := fmt.Sprintf("GoRegister -server $zkServer -action regist -contextPath %s -appHost %s -appPort 80 -skipPrefix %s", contextPathStr, serviceClusterIP, skipPrefik)
 
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -165,7 +169,8 @@ func newPodForCR(cr *k8sv1.OpDemo, serviceClusterIP string) *corev1.Pod {
 					Name:    "busybox",
 					Image:   "busybox",
 					Command: []string{"/bin/sh"},
-					Args:    []string{"-c", fmt.Sprintf("echo '%s' ;sleep 3600", registArg)},
+					Args:    []string{"-c", fmt.Sprintf("echo \"%s\" ;sleep 3600", registArg)},
+					Env:     []corev1.EnvVar{corev1.EnvVar{Name: "zkServer", Value: "192.168.22.145:2181,172.20.10.222:2181"}},
 				},
 			},
 		},
