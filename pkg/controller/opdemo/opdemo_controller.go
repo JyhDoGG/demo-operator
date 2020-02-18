@@ -151,7 +151,8 @@ func newPodForCR(cr *k8sv1.OpDemo, serviceClusterIP string) *corev1.Pod {
 		}
 	}
 	skipPrefik := "0"
-	if cr.Name == "orgunit-rest" {
+	switch cr.Name {
+	case "orgunit-rest", "microblog-rest", "community-rest":
 		skipPrefik = "1"
 	}
 	registArg := fmt.Sprintf("GoRegister -server $zkServer -action regist -contextPath %s -appHost %s -appPort 80 -skipPrefix %s", contextPathStr, serviceClusterIP, skipPrefik)
